@@ -100,8 +100,8 @@ if SimpleCov.usable?
               expect(dumped_result.command_name).to eq(subject.command_name)
             end
 
-            it "has the same original_result" do
-              expect(dumped_result.original_result).to eq(subject.original_result)
+            it "has the same hash_result" do
+              expect(dumped_result.hash_result).to eq(subject.hash_result)
             end
           end
         end
