@@ -74,7 +74,8 @@ module SimpleCov
 
     # The full path to this source file (e.g. /User/colszowka/projects/simplecov/lib/simplecov/source_file.rb)
     attr_reader :filename
-    # The array of coverage data received from the Coverage.result
+
+    # The hash of coverage data received from the Coverage.result
     attr_reader :coverage
 
     def initialize(filename, coverage)
@@ -103,10 +104,10 @@ module SimpleCov
     alias source_lines lines
 
     def build_lines
-      coverage_exceeding_source_warn if coverage.size > src.size
+      coverage_exceeding_source_warn if coverage[:lines].size > src.size
 
       lines = src.map.with_index(1) do |src, i|
-        SimpleCov::SourceFile::Line.new(src, i, coverage[i - 1])
+        SimpleCov::SourceFile::Line.new(src, i, coverage[:lines][i - 1])
       end
 
       process_skipped_lines(lines)
@@ -114,7 +115,7 @@ module SimpleCov
 
     # Warning to identify condition from Issue #56
     def coverage_exceeding_source_warn
-      $stderr.puts "Warning: coverage data provided by Coverage [#{coverage.size}] exceeds number of lines in #{filename} [#{src.size}]"
+      $stderr.puts "Warning: coverage data provided by Coverage [#{coverage[:lines].size}] exceeds number of lines in #{filename} [#{src.size}]"
     end
 
     # Access SimpleCov::SourceFile::Line source lines by line number
