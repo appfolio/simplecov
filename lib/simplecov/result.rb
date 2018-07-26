@@ -78,11 +78,14 @@ module SimpleCov
     def coverage
       keys = original_result.keys & filenames
       if SimpleCov.branch_coverage?
-         # filename => {:lines => [], :branches => [], :methods => []}
-        Hash[keys.zip(original_result.values_at(*keys).map { |e| e[:lines] })]
-      else
-        # filename => []
+        # filename => {:lines => [], :branches => [], :methods => []}
         Hash[keys.zip(original_result.values_at(*keys))]
+      else
+        # change format from:
+        # filename => []
+        # to:
+        # filename => {:lines => [] }
+        Hash[keys.zip(original_result.values_at(*keys).map { |line_cov| {:lines => line_cov }})]
       end
     end
 
