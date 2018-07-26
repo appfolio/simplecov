@@ -50,7 +50,7 @@ module SimpleCov
         @result = nil
         self.running = true
         self.pid = Process.pid
-        if RUBY_VERSION >= "2.5"
+        if RUBY_VERSION >= "2.5" # TODO: extract this check into a helper method
           Coverage.start(:all) # ML: turn on all flags
         else
           Coverage.start

@@ -77,7 +77,13 @@ module SimpleCov
 
     def coverage
       keys = original_result.keys & filenames
-      Hash[keys.zip(original_result.values_at(*keys))]
+      if RUBY_VERSION >= "2.5"
+         # filename => {:lines => [], :branches => [], :methods => []}
+        Hash[keys.zip(original_result.values_at(*keys).map { |e| e[:lines] })]
+      else
+        # filename => []
+        Hash[keys.zip(original_result.values_at(*keys))]
+      end
     end
 
     # Applies all configured SimpleCov filters on this result's source files
