@@ -50,8 +50,8 @@ module SimpleCov
         @result = nil
         self.running = true
         self.pid = Process.pid
-        if RUBY_VERSION >= "2.5" # TODO: extract this check into a helper method
-          Coverage.start(:all) # ML: turn on all flags
+        if branch_coverage?
+          Coverage.start(:all)
         else
           Coverage.start
         end
@@ -164,6 +164,15 @@ module SimpleCov
       rescue LoadError
         false
       end
+    end
+
+    #
+    # Checks whether we're on a modern version of Ruby (likely 2.5+) which
+    # provides branch and method coverage support.
+    # Traditional Rubies only provide line coverage.
+    #
+    def branch_coverage?
+      Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.5")
     end
 
     #

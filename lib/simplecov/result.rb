@@ -77,7 +77,7 @@ module SimpleCov
 
     def coverage
       keys = original_result.keys & filenames
-      if RUBY_VERSION >= "2.5"
+      if SimpleCov.branch_coverage?
          # filename => {:lines => [], :branches => [], :methods => []}
         Hash[keys.zip(original_result.values_at(*keys).map { |e| e[:lines] })]
       else
