@@ -22,9 +22,10 @@ module SimpleCov
 
     def merge_file_coverage(file1, file2)
       return (file1 || file2).dup unless file1 && file2
-
-      file1.map.with_index do |count1, index|
-        count2 = file2[index]
+      lines1 = file1.is_a?(Array) ? file1 : (file1[:lines] || file1["lines"])
+      lines2 = file2.is_a?(Array) ? file2 : (file2[:lines] || file2["lines"])
+      lines1.map.with_index do |count1, index|
+        count2 = lines2[index]
         merge_line_coverage(count1, count2)
       end
     end
