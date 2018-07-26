@@ -25,9 +25,13 @@ module SimpleCov
     def_delegator :files, :lines_of_code, :total_lines
 
     # Initialize a new SimpleCov::Result from given Coverage.result (a Hash of filenames each containing an array of
-    # coverage data)
-    def initialize(original_result)
-      @hash_result = hashify(original_result).freeze
+    # coverage data) OR from serialized coverage data
+    def initialize(result)
+      if result[result.keys.first].is_a?(Array)
+        @hash_result = hashify(result).freeze
+      else
+        @hash_result = result.freeze
+      end
       @files = SimpleCov::FileList.new(hash_result.map do |filename, coverage|
         SimpleCov::SourceFile.new(filename, coverage) if File.file?(filename)
       end.compact.sort_by(&:filename))
