@@ -10,8 +10,9 @@ module SimpleCov
   #
   class Result
     extend Forwardable
-    # Returns the original Coverage.result used for this instance of SimpleCov::Result
-    attr_reader :original_result
+    # Returns the Ruby 2.5 style Coverage.result used for this instance of SimpleCov::Result
+    attr_reader :hash_result
+
     # Returns all files that are applicable to this result (sans filters!) as instances of SimpleCov::SourceFile. Aliased as :source_files
     attr_reader :files
     alias source_files files
@@ -26,8 +27,8 @@ module SimpleCov
     # Initialize a new SimpleCov::Result from given Coverage.result (a Hash of filenames each containing an array of
     # coverage data)
     def initialize(original_result)
-      @original_result = original_result.freeze
-      @files = SimpleCov::FileList.new(original_result.map do |filename, coverage|
+      @hash_result = hashify(original_result).freeze
+      @files = SimpleCov::FileList.new(hash_result.map do |filename, coverage|
         SimpleCov::SourceFile.new(filename, coverage) if File.file?(filename)
       end.compact.sort_by(&:filename))
       filter!
@@ -75,18 +76,22 @@ module SimpleCov
 
   private
 
-    def coverage
-      keys = original_result.keys & filenames
+    def hashify(original_result)
       if SimpleCov.branch_coverage?
         # filename => {:lines => [], :branches => [], :methods => []}
-        Hash[keys.zip(original_result.values_at(*keys))]
+        original_result
       else
         # change format from:
         # filename => []
         # to:
         # filename => {:lines => [] }
-        Hash[keys.zip(original_result.values_at(*keys).map { |line_cov| {:lines => line_cov }})]
+        original_result.reduce({}){ |hash, (filename, line_cov)| hash.merge( filename => {:lines => line_cov } )  }
       end
+    end
+
+    def coverage
+      keys = hash_result.keys & filenames
+      Hash[keys.zip(hash_result.values_at(*keys))]
     end
 
     # Applies all configured SimpleCov filters on this result's source files
