@@ -19,8 +19,9 @@ if SimpleCov.usable?
           source_fixture("app/controllers/sample_controller.rb") => [nil, 1, 1, 1, nil, nil, 1, 0, nil, nil],
           source_fixture("resultset1.rb") => [1, 1, 1, 1],
           source_fixture("parallel_tests.rb") => [nil, 0, nil, 0],
-          source_fixture("conditionally_loaded_1.rb") => [nil, 0, 1],  # loaded only in the first resultset
+          source_fixture("conditionally_loaded_1.rb") => [nil, 0, 1], # loaded only in the first resultset
         }
+        @resultset1 = SimpleCov::Result.hashify(@resultset1) if SimpleCov.branch_coverage?
 
         @resultset2 = {
           source_fixture("sample.rb") => [1, nil, 1, 1, nil, nil, 1, 1, nil, nil],
@@ -28,13 +29,14 @@ if SimpleCov.usable?
           source_fixture("app/controllers/sample_controller.rb") => [nil, 3, 1, nil, nil, nil, 1, 0, nil, nil],
           source_fixture("resultset2.rb") => [nil, 1, 1, nil],
           source_fixture("parallel_tests.rb") => [nil, nil, 0, 0],
-          source_fixture("conditionally_loaded_2.rb") => [nil, 0, 1],  # loaded only in the second resultset
+          source_fixture("conditionally_loaded_2.rb") => [nil, 0, 1], # loaded only in the second resultset
         }
+        @resultset2 = SimpleCov::Result.hashify(@resultset2) if SimpleCov.branch_coverage?
       end
 
       # See GitHub issue #6
       it "returns an empty hash when the resultset cache file is empty" do
-        File.open(SimpleCov::ResultMerger.resultset_path, "w+") { |f| f.puts "" }
+        File.open(SimpleCov::ResultMerger.resultset_path, "w+") {|f| f.puts ""}
         expect(SimpleCov::ResultMerger.resultset).to be_empty
       end
 
@@ -160,7 +162,7 @@ if SimpleCov.usable?
 
           # despite the sleeps, this will be written first since we got
           # the first lock
-          File.open(file.path, "a") { |f| f.write("process 1\n") }
+          File.open(file.path, "a") {|f| f.write("process 1\n")}
         end
 
         # wait for it to finish
