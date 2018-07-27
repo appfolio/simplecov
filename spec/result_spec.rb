@@ -26,7 +26,8 @@ if SimpleCov.usable?
                     source_fixture("app/models/user.rb") => [nil, 1, 1, 1, nil, nil, 1, 0, nil, nil],
                     source_fixture("app/controllers/sample_controller.rb") => [nil, 1, 1, 1, nil, nil, 1, 0, nil, nil],
         }
-        SimpleCov::Result.hashify(result) if SimpleCov.branch_coverage?
+        result = SimpleCov::Result.hashify(result) if SimpleCov.branch_coverage?
+        result
       end
 
       context "a simple cov result initialized from that" do
