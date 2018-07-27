@@ -30,11 +30,9 @@ if SimpleCov.usable?
           source_fixture("three.rb") => [nil, 1, 2],
         }
 
-        if SimpleCov.branch_coverage?
-          @resultset1 = SimpleCov::Result.hashify(@resultset1)
-          @resultset2 = SimpleCov::Result.hashify(@resultset2)
-          @resultset3 = SimpleCov::Result.hashify(@resultset3)
-        end
+        @resultset1 = SimpleCov::Result.hashify(@resultset1)
+        @resultset2 = SimpleCov::Result.hashify(@resultset2)
+        @resultset3 = SimpleCov::Result.hashify(@resultset3)
       end
 
       context "a merge" do
@@ -90,10 +88,8 @@ if SimpleCov.usable?
         source_fixture("sample.rb").freeze => [1, nil, 1, 1, nil, nil, 1, 1, nil, nil].freeze,
       }.freeze
 
-      if SimpleCov.branch_coverage?
-        resultset1 = SimpleCov::Result.hashify(resultset1).freeze
-        resultset2 = SimpleCov::Result.hashify(resultset2).freeze
-      end
+      resultset1 = SimpleCov::Result.hashify(resultset1).freeze
+      resultset2 = SimpleCov::Result.hashify(resultset2).freeze
 
       merged_result = SimpleCov::RawCoverage.merge_results(resultset1, resultset2)
       expect(merged_result.keys).to eq(resultset1.keys)
