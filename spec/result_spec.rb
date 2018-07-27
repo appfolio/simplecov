@@ -21,19 +21,12 @@ if SimpleCov.usable?
       end
 
       let(:original_result) do
-        if SimpleCov.branch_coverage?
-          {
-            source_fixture("sample.rb") => { :lines => [nil, 1, 1, 1, nil, nil, 1, 1, nil, nil] },
-            source_fixture("app/models/user.rb") => { :lines => [nil, 1, 1, 1, nil, nil, 1, 0, nil, nil] },
-            source_fixture("app/controllers/sample_controller.rb") => { :lines => [nil, 1, 1, 1, nil, nil, 1, 0, nil, nil] },
-          }
-        else
-          {
-            source_fixture("sample.rb") => [nil, 1, 1, 1, nil, nil, 1, 1, nil, nil],
-            source_fixture("app/models/user.rb") => [nil, 1, 1, 1, nil, nil, 1, 0, nil, nil],
-            source_fixture("app/controllers/sample_controller.rb") => [nil, 1, 1, 1, nil, nil, 1, 0, nil, nil],
-          }
-        end
+        result = {
+                    source_fixture("sample.rb") => [nil, 1, 1, 1, nil, nil, 1, 1, nil, nil],
+                    source_fixture("app/models/user.rb") => [nil, 1, 1, 1, nil, nil, 1, 0, nil, nil],
+                    source_fixture("app/controllers/sample_controller.rb") => [nil, 1, 1, 1, nil, nil, 1, 0, nil, nil],
+        }
+        SimpleCov::Result.hashify(result) if SimpleCov.branch_coverage?
       end
 
       context "a simple cov result initialized from that" do
