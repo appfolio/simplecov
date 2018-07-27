@@ -27,8 +27,8 @@ module SimpleCov
     # Initialize a new SimpleCov::Result from given Coverage.result (a Hash of filenames each containing an array of
     # coverage data) OR from serialized coverage data
     def initialize(result)
-      if result[result.keys.first].is_a?(Array)
-        @hash_result = hashify(result).freeze
+      if SimpleCov.branch_coverage? && result[result.keys.first].is_a?(Array)
+        @hash_result = Result.hashify(result).freeze
       else
         @hash_result = result.freeze
       end
@@ -78,20 +78,15 @@ module SimpleCov
       result
     end
 
-  private
-
-    def hashify(original_result)
-      if SimpleCov.branch_coverage?
-        # filename => {:lines => [], :branches => [], :methods => []}
-        original_result
-      else
-        # change format from:
-        # filename => []
-        # to:
-        # filename => {:lines => [] }
-        original_result.reduce({}){ |hash, (filename, line_cov)| hash.merge( filename => {:lines => line_cov } )  }
-      end
+    # change format from:
+    # filename => []
+    # to:
+    # filename => {:lines => [] }
+    def self.hashify(original_result)
+      original_result.reduce({}){ |hash, (filename, line_cov)| hash.merge( filename => {:lines => line_cov } )  }
     end
+
+  private
 
     def coverage
       keys = hash_result.keys & filenames
