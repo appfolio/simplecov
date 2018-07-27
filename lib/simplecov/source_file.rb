@@ -215,6 +215,7 @@ module SimpleCov
     end
 
     def branch_coverage_percent
+      return 100 if total_branches_count.zero?
       # Eventually used in the .json output
       (covered_branches_count.to_f / total_branches_count.to_f) * 100
     end
@@ -237,6 +238,7 @@ module SimpleCov
     end
 
     def methods_coverage_percent
+      return 100 if total_methods_count.zero?
       # Eventually used in the .json output
       (covered_methods_count.to_f/total_methods_count.to_f) * 100
     end
