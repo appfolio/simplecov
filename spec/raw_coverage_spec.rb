@@ -29,6 +29,10 @@ if SimpleCov.usable?
         @resultset3 = {
           source_fixture("three.rb") => [nil, 1, 2],
         }
+
+        @resultset1 = SimpleCov::Result.hashify(@resultset1)
+        @resultset2 = SimpleCov::Result.hashify(@resultset2)
+        @resultset3 = SimpleCov::Result.hashify(@resultset3)
       end
 
       context "a merge" do
@@ -37,39 +41,39 @@ if SimpleCov.usable?
         end
 
         it "has proper results for sample.rb" do
-          expect(subject[source_fixture("sample.rb")]).to eq([1, 1, 2, 2, nil, nil, 2, 2, nil, nil])
+          expect(subject[source_fixture("sample.rb")]).to eq(:lines => [1, 1, 2, 2, nil, nil, 2, 2, nil, nil])
         end
 
         it "has proper results for user.rb" do
-          expect(subject[source_fixture("app/models/user.rb")]).to eq([nil, 2, 6, 2, nil, nil, 2, 0, nil, nil])
+          expect(subject[source_fixture("app/models/user.rb")]).to eq(:lines => [nil, 2, 6, 2, nil, nil, 2, 0, nil, nil])
         end
 
         it "has proper results for sample_controller.rb" do
-          expect(subject[source_fixture("app/controllers/sample_controller.rb")]).to eq([nil, 4, 2, 1, nil, nil, 2, 0, nil, nil])
+          expect(subject[source_fixture("app/controllers/sample_controller.rb")]).to eq(:lines => [nil, 4, 2, 1, nil, nil, 2, 0, nil, nil])
         end
 
         it "has proper results for resultset1.rb" do
-          expect(subject[source_fixture("resultset1.rb")]).to eq([1, 1, 1, 1])
+          expect(subject[source_fixture("resultset1.rb")]).to eq(:lines => [1, 1, 1, 1])
         end
 
         it "has proper results for resultset2.rb" do
-          expect(subject[source_fixture("resultset2.rb")]).to eq([nil, 1, 1, nil])
+          expect(subject[source_fixture("resultset2.rb")]).to eq(:lines => [nil, 1, 1, nil])
         end
 
         it "has proper results for parallel_tests.rb" do
-          expect(subject[source_fixture("parallel_tests.rb")]).to eq([nil, nil, nil, 0])
+          expect(subject[source_fixture("parallel_tests.rb")]).to eq(:lines => [nil, nil, nil, 0])
         end
 
         it "has proper results for conditionally_loaded_1.rb" do
-          expect(subject[source_fixture("conditionally_loaded_1.rb")]).to eq([nil, 0, 1])
+          expect(subject[source_fixture("conditionally_loaded_1.rb")]).to eq(:lines => [nil, 0, 1])
         end
 
         it "has proper results for conditionally_loaded_2.rb" do
-          expect(subject[source_fixture("conditionally_loaded_2.rb")]).to eq([nil, 0, 1])
+          expect(subject[source_fixture("conditionally_loaded_2.rb")]).to eq(:lines => [nil, 0, 1])
         end
 
         it "has proper results for three.rb" do
-          expect(subject[source_fixture("three.rb")]).to eq([nil, 3, 7])
+          expect(subject[source_fixture("three.rb")]).to eq(:lines => [nil, 3, 7])
         end
       end
     end
@@ -84,11 +88,14 @@ if SimpleCov.usable?
         source_fixture("sample.rb").freeze => [1, nil, 1, 1, nil, nil, 1, 1, nil, nil].freeze,
       }.freeze
 
+      resultset1 = SimpleCov::Result.hashify(resultset1).freeze
+      resultset2 = SimpleCov::Result.hashify(resultset2).freeze
+
       merged_result = SimpleCov::RawCoverage.merge_results(resultset1, resultset2)
       expect(merged_result.keys).to eq(resultset1.keys)
       expect(merged_result.values.map(&:frozen?)).to eq([false, false])
-      expect(merged_result[source_fixture("sample.rb")]).to eq([1, 1, 2, 2, nil, nil, 2, 2, nil, nil])
-      expect(merged_result[source_fixture("app/models/user.rb")]).to eq([nil, 1, 1, 1, nil, nil, 1, 0, nil, nil])
+      expect(merged_result[source_fixture("sample.rb")]).to eq(:lines => [1, 1, 2, 2, nil, nil, 2, 2, nil, nil])
+      expect(merged_result[source_fixture("app/models/user.rb")]).to eq(:lines => [nil, 1, 1, 1, nil, nil, 1, 0, nil, nil])
     end
   end
 end

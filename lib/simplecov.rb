@@ -50,7 +50,11 @@ module SimpleCov
         @result = nil
         self.running = true
         self.pid = Process.pid
-        Coverage.start
+        if branch_coverage?
+          Coverage.start(:all)
+        else
+          Coverage.start
+        end
       else
         warn "WARNING: SimpleCov is activated, but you're not running Ruby 1.9+ - no coverage analysis will happen"
         warn "Starting with SimpleCov 1.0.0, even no-op compatibility with Ruby <= 1.8 will be entirely dropped."
@@ -160,6 +164,15 @@ module SimpleCov
       rescue LoadError
         false
       end
+    end
+
+    #
+    # Checks whether we're on a modern version of Ruby (likely 2.5+) which
+    # provides branch and method coverage support.
+    # Traditional Rubies only provide line coverage.
+    #
+    def branch_coverage?
+      Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("2.5")
     end
 
     #

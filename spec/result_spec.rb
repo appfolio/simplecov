@@ -21,11 +21,13 @@ if SimpleCov.usable?
       end
 
       let(:original_result) do
-        {
-          source_fixture("sample.rb") => [nil, 1, 1, 1, nil, nil, 1, 1, nil, nil],
-          source_fixture("app/models/user.rb") => [nil, 1, 1, 1, nil, nil, 1, 0, nil, nil],
-          source_fixture("app/controllers/sample_controller.rb") => [nil, 1, 1, 1, nil, nil, 1, 0, nil, nil],
+        result = {
+                    source_fixture("sample.rb") => [nil, 1, 1, 1, nil, nil, 1, 1, nil, nil],
+                    source_fixture("app/models/user.rb") => [nil, 1, 1, 1, nil, nil, 1, 0, nil, nil],
+                    source_fixture("app/controllers/sample_controller.rb") => [nil, 1, 1, 1, nil, nil, 1, 0, nil, nil],
         }
+        result = SimpleCov::Result.hashify(result) if SimpleCov.branch_coverage?
+        result
       end
 
       context "a simple cov result initialized from that" do
@@ -100,8 +102,8 @@ if SimpleCov.usable?
               expect(dumped_result.command_name).to eq(subject.command_name)
             end
 
-            it "has the same original_result" do
-              expect(dumped_result.original_result).to eq(subject.original_result)
+            it "has the same hash_result" do
+              expect(dumped_result.hash_result).to eq(subject.hash_result)
             end
           end
         end
