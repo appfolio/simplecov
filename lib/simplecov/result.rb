@@ -27,7 +27,7 @@ module SimpleCov
     # Initialize a new SimpleCov::Result from given Coverage.result (a Hash of filenames each containing an array of
     # coverage data) OR from serialized coverage data
     def initialize(result)
-      if SimpleCov.branch_coverage? && result[result.keys.first].is_a?(Array)
+      if result[result.keys.first].is_a?(Array)
         @hash_result = Result.hashify(result).freeze
       else
         @hash_result = result.freeze
