@@ -41,4 +41,7 @@ group :development do
   gem "benchmark-ips"
 end
 
+gem 'pry-byebug'
+gem 'simplecov-html', path: '/Users/appfolio/src/simplecov-html'
+
 gemspec

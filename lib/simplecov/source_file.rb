@@ -192,6 +192,30 @@ module SimpleCov
       end
     end
 
+    def branch_coverage_metrics
+      @branch_stats = []
+      coverage[:branches].values.each do |branches|
+        @branch_stats << branches.values
+      end
+      @branch_stats.flatten
+    end
+
+    def missed_branches_count
+      branch_coverage_metrics.count(0)
+    end
+
+    def covered_branches_count
+      branch_coverage_metrics.count { |x| x != 0 }
+    end
+
+    def total_branches_count
+      branch_coverage_metrics.count
+    end
+
+    def branch_coverage_percent
+      (covered_branches_count.to_f / total_branches_count.to_f) * 100
+    end
+
   private
 
     # ruby 1.9 could use Float#round(places) instead
