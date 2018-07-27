@@ -94,6 +94,7 @@ module SimpleCov
       # suppress reading unused source code.
       @src ||= File.open(filename, "rb", &:readlines)
     end
+
     alias source src
 
     # Returns all source lines for this file as instances of SimpleCov::SourceFile::Line,
@@ -101,6 +102,7 @@ module SimpleCov
     def lines
       @lines ||= build_lines
     end
+
     alias source_lines lines
 
     def build_lines
@@ -193,11 +195,11 @@ module SimpleCov
     end
 
     def branch_coverage_metrics
-      @branch_stats = []
+      branch_stats = []
       coverage[:branches].values.each do |branches|
-        @branch_stats << branches.values
+        branch_stats << branches.values
       end
-      @branch_stats.flatten
+      branch_stats.flatten
     end
 
     def missed_branches_count
@@ -205,7 +207,7 @@ module SimpleCov
     end
 
     def covered_branches_count
-      branch_coverage_metrics.count { |x| x != 0 }
+      branch_coverage_metrics.count {|x| x != 0}
     end
 
     def total_branches_count
@@ -213,10 +215,33 @@ module SimpleCov
     end
 
     def branch_coverage_percent
+      # Eventually used in the .json output
       (covered_branches_count.to_f / total_branches_count.to_f) * 100
     end
 
-  private
+    def methods_coverage
+      # Methods coverage format: {[method1] => count, [method2] => count}
+      coverage[:methods]
+    end
+
+    def missed_methods_count
+      methods_coverage.values.count(0)
+    end
+
+    def covered_methods_count
+      methods_coverage.values.count { |x| x != 0 }
+    end
+
+    def total_methods_count
+      methods_coverage.values.count
+    end
+
+    def methods_coverage_percent
+      # Eventually used in the .json output
+      (covered_methods_count.to_f/total_methods_count.to_f) * 100
+    end
+
+    private
 
     # ruby 1.9 could use Float#round(places) instead
     # @return [Float]

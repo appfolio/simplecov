@@ -76,5 +76,24 @@ module SimpleCov
       return 0.0 if empty?
       map { |f| f.covered_branches_count }.inject(:+)
     end
+
+    def total_methods_count
+      covered_methods_count + missed_methods_count
+    end
+
+    def methods_coverage_percent
+      return 100.0 if empty? || total_methods_count.zero?
+      Float(covered_methods_count * 100.0 / total_methods_count)
+    end
+
+    def missed_methods_count
+      return 0.0 if empty?
+      map {|f| f.missed_methods_count}.inject(:+)
+    end
+
+    def covered_methods_count
+      return 0.0 if empty?
+      map {|f| f.covered_methods_count}.inject(:+)
+    end
   end
 end
