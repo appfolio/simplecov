@@ -24,10 +24,11 @@ module SimpleCov
       return (file1 || file2).dup unless file1 && file2
       lines1 = file1.is_a?(Array) ? file1 : (file1[:lines] || file1["lines"])
       lines2 = file2.is_a?(Array) ? file2 : (file2[:lines] || file2["lines"])
-      lines1.map.with_index do |count1, index|
+      retval = lines1.map.with_index do |count1, index|
         count2 = lines2[index]
         merge_line_coverage(count1, count2)
       end
+      { :lines => retval }
     end
 
     def merge_line_coverage(count1, count2)
