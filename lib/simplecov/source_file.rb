@@ -26,7 +26,7 @@ module SimpleCov
       alias line line_number
       alias number line_number
 
-      def initialize(src, line_number, coverage)
+      def initialize(src, line_number, coverage, partial)
         raise ArgumentError, "Only String accepted for source" unless src.is_a?(String)
         raise ArgumentError, "Only Integer accepted for line_number" unless line_number.is_a?(Integer)
         raise ArgumentError, "Only Integer and nil accepted for coverage" unless coverage.is_a?(Integer) || coverage.nil?
@@ -34,6 +34,7 @@ module SimpleCov
         @line_number = line_number
         @coverage    = coverage
         @skipped     = false
+        @partial     = partial
       end
 
       # Returns true if this is a line that should have been covered, but was not
@@ -44,6 +45,10 @@ module SimpleCov
       # Returns true if this is a line that has been covered
       def covered?
         !never? && !skipped? && coverage > 0
+      end
+
+      def partial?
+        @partial
       end
 
       # Returns true if this line is not relevant for coverage
@@ -65,6 +70,7 @@ module SimpleCov
       # The status of this line - either covered, missed, skipped or never. Useful i.e. for direct use
       # as a css class in report generation
       def status
+        return "partial" if partial?
         return "skipped" if skipped?
         return "never" if never?
         return "missed" if missed?
@@ -109,11 +115,73 @@ module SimpleCov
       coverage_exceeding_source_warn if coverage[:lines].size > src.size
 
       lines = src.map.with_index(1) do |src, i|
-        SimpleCov::SourceFile::Line.new(src, i, coverage[:lines][i - 1])
+        partial = partial_branch_lines&.include?(i)
+        SimpleCov::SourceFile::Line.new(src, i, coverage[:lines][i - 1], partial)
       end
 
       process_skipped_lines(lines)
     end
+
+    def non_branch_line?(line_number)
+      !(covered_branch_lines.include?(line_number) || missed_branch_lines.include?(line_number))
+    end
+
+    def partial_branch_lines
+      @partial_branches = []
+      coverage[:branches].each_pair do |key, value|
+        # check if any of them has same start line as if:
+        # verify if fully covered(both values > 0)/not covered(both values ==0)/ partial covered(one 0 and other >0)
+        start_line_number = key[2]
+        end_line_number = key[4]
+        has_zero_coverage = false
+        has_non_zero_coverage = false
+        same_line_number = false
+        value.each_pair do |branch, coverage|
+          same_line_number = true if branch[2] == start_line_number && branch[4] == end_line_number
+          if coverage == 0
+            has_zero_coverage = true
+          else
+            has_non_zero_coverage = true
+          end
+        end
+        if has_zero_coverage && has_non_zero_coverage && same_line_number
+          (start_line_number..end_line_number).each do |line_number|
+            @partial_branches << line_number
+          end
+        end
+      end
+      @partial_branches
+    end
+
+    # def covered_branch_lines
+    #   @covered_branches = []
+    #   coverage[:branches].each_pair do |key, value|
+    #     # check if any of them has same start line as if:
+    #     # verify if fully covered(both values > 0)/not covered(both values ==0)/ partial covered(one 0 and other >0)
+    #     value.each_pair do |branch, coverage|
+    #       if coverage != 0 && !(branch[2] == key[2] && branch[3] == key[3] && branch[4] == key[4] && branch[5] == key[5])
+    #         (branch[2]..branch[4]).each do |line_number|
+    #           @covered_branches << line_number
+    #         end
+    #       end
+    #     end
+    #   end
+    #   @covered_branches.map{ |ln| ln unless missed_branch_lines&.include?(ln) }.compact.uniq!
+    # end
+    #
+    # def missed_branch_lines
+    #   @missed_branches = []
+    #   coverage[:branches].each_pair do |key, value|
+    #     value.each_pair do |branch, coverage|
+    #       if coverage == 0 && !(branch[2] == key[2] && branch[3] == key[3] && branch[4] == key[4] && branch[5] == key[5])
+    #         (branch[2]..branch[4]).each do |line_number|
+    #           @missed_branches << line_number
+    #         end
+    #       end
+    #     end
+    #   end
+    #   @missed_branches.uniq!
+    # end
 
     # Warning to identify condition from Issue #56
     def coverage_exceeding_source_warn
